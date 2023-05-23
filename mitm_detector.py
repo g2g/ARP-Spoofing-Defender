@@ -44,9 +44,9 @@ class DetectorMITMAttack:
                 return False
 
             if arp_packet.op == 2 and arp_packet.hwsrc != arp_packet.hwdst:
-                print(f"\033[1;32m\033[1;32m[ATTENTION]\033[91m Потенциальная MITM-атака обнаружена: \033[91m{arp_packet.hwsrc} ({arp_packet.psrc}) -> \033[1;32m\033[1;32m{arp_packet.hwdst} ({arp_packet.pdst})\033[0m")
+                print(f"\033[1;32m\033[1;32m[ATTENTION]\033[91m Potential MITM attack detected: \033[91m{arp_packet.hwsrc} ({arp_packet.psrc}) -> \033[1;32m\033[1;32m{arp_packet.hwdst} ({arp_packet.pdst})\033[0m")
 
-                warn_message = f"Обнаружена MITM-атака: {arp_packet.hwsrc} ({arp_packet.psrc}) -> {arp_packet.hwdst} ({arp_packet.pdst})"
+                warn_message = f"MITM attack detected: {arp_packet.hwsrc} ({arp_packet.psrc}) -> {arp_packet.hwdst} ({arp_packet.pdst})"
                 send_notification(
                     "MITM Detector", 
                     warn_message
@@ -59,14 +59,14 @@ class DetectorMITMAttack:
         return
 
     def start_sniffing(self) -> None:
-        print(f"\033[1;32m\033[1;32m[INFO]\033[91m\033[91m Запуск захвата пакетов на интерфейсе\033[0m {self.interface}")
-        logging.info(f"Запуск захвата пакетов на интерфейсе {self.interface}")
+        print(f"\033[1;32m\033[1;32m[INFO]\033[91m\033[91m Start packet capture on interface\033[0m {self.interface}")
+        logging.info(f"Start packet capture on interface {self.interface}")
         sniff(iface=self.interface, prn=self.is_mitm_attack)
 
 
 def start_mitm_detection(interface, target_ip):
     if interface not in get_interfaces():
-        print("\033[1;32m[ERROR]\033[1;31m Указанный сетевой интерфейс не найден\033[0m")
+        print("\033[1;32m[ERROR]\033[1;31m The specified network interface was not found\033[0m")
         return False
     mitm = DetectorMITMAttack(interface, target_ip)
     thread = Thread(target=mitm.start_sniffing)
@@ -78,14 +78,14 @@ def main():
     interfaces = get_interfaces()
     default_gateway_ip = get_gateway_ip()
 
-    print("Выберите вариант запуска")
-    print("1. Ввести сетевой интерфейс вручную")
-    print(f"2. Запуск на все сетевые устройства \033[1;32m\033[1;32m(Обнаружены ({len(interfaces)}): {interfaces})\033[1;37m\033[1;37m")
+    print("Select launch option")
+    print("1. Enter network interface manually")
+    print(f"2. Run on all network devices \033[1;32m\033[1;32m(Discovered ({len(interfaces)}): {interfaces})\033[1;37m\033[1;37m")
 
     choice = input("\033[1;32m\033[1;32m~# \033[1;37m\033[1;37m")
 
     if choice == '1':
-        print("\nВведите имя сетевого интерфейса: (например wlan0)")
+        print("\nEnter network interface name: (for example wlan0)")
         interface = input("\033[1;32m\033[1;32m~# \033[1;37m\033[1;37m")
         start_mitm_detection(interface, default_gateway_ip)
     elif choice == '2':
